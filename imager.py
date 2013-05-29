@@ -7,7 +7,7 @@ from itertools import izip, imap, groupby, izip_longest
 from multiprocessing import Pool
 import sys
 
-THRESHOLD = 50
+THRESHOLD = 60
 
 
 def grouper(iterable, n, fillvalue=None):
@@ -39,8 +39,12 @@ def bbox(img, bg, size, thresh):
     assert len(img) == len(bg)
     assert len(img) % 3 == 0
 
+    shade = ""
+
     for i, (ip, bp) in enumerate(izip(grouper(img, 3), grouper(bg, 3))):
         if abs(ord(ip[0]) - ord(bp[0])) > thresh:
+            shade += "\255\255\255"
+
             if i % width < minx:
                 minx = i % width
                 continue
@@ -57,9 +61,15 @@ def bbox(img, bg, size, thresh):
                 maxy = i // width
                 continue
 
+        else:
+            shade += "\0\0\0"
+
     ret = (minx, miny, maxx, maxy)
 
     save_boxed(img, ret, size)
+
+    Image.fromstring("RGB", size, shade).save("shady/img%04d.png" % save_boxed.myid)
+
     return ret
 
 
@@ -85,15 +95,23 @@ bg_img = Image.fromstring("RGB", size, bg)
 bg_img.save("bg.png", "PNG")
 
 bboxes = map(functools.partial(bbox, bg=bg, size=size, thresh=THRESHOLD), img_data)
-strides = map(lambda (xt,yt,xb,yb): xb-xt, bboxes)
+strides = map(lambda (xt,yt,xb,yb): (xb-xt, yb-yt), bboxes)
 
-print "Bboxes:"
+print "Bboxes and shades:"
 print "\n".join(map(str, bboxes[-10:]))
-print "Last box:"
-print bboxes[-1]
 
 with open("strides.dat", "w") as f:
-    for i, s in enumerate(strides):
-        f.write("%d %d\n" % (i, s))
+    f.write("# id width height")
+    for i, (w, h) in enumerate(strides):
+        f.write("%d %d %d\n" % (i, w, h))
 
-print "writen strides.dat"
+print "writen strides.dat. Plot using the plotter.gplt script."
+
+changes = 0
+for (p1,h1), (p2,h2), (p3,h3) in izip(strides, strides[1:], strides[:2]):
+    d = (p2-p1) * (p3-p2)
+
+    if p<0:
+        changes += 1
+
+print "The mean period should be %d" % (changes / 2)

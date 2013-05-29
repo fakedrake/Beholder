@@ -1,0 +1,88 @@
+* Lab excesize 4
+  First of all to run this you will need =pillow= or =PIL= and
+  =numpy=. Both are installable frim pypi with =easy_install= or
+  =pip=. You may also need to create empty directories =boxed= and
+  =shady=. Really easy:
+
+  #+BEGIN_EXAMPLE
+  $ mkdir shady boxed
+  #+END_EXAMPLE
+
+** Usage
+   Just run imager.py with the image sequence as arguments.
+
+   #+BEGIN_EXAMPLE
+   python imager.py Sequence_1/*.png
+   #+END_EXAMPLE
+
+   This will generate the following:
+
+   - A copy of the original image sequence with the bounding box around
+     the figure in the =boxed= directory.
+   - A copy of the sequence where the pixels that qualify as figure as
+     white in the =shady= directory.
+   - The background of the image =bg.png=
+
+   Note: While the script is quite fast there are a couple of obvious
+   further optimizations. For example once the background is computed
+   once the script doesnt try to recalculate it inless =bg.png= is
+   removed.
+
+   Here are a couple of images to please your eyes
+*** Bounding boxes
+
+    #+CAPTION: Bounding-boxed image 1
+    #+NAME:   fig:boxed1
+    [[./boxed/img0000.png]]
+
+    #+CAPTION: Bounding-boxed image 51
+    #+NAME:   fig:boxed2
+    [[./boxed/img0050.png]]
+
+    #+CAPTION: Bounding-boxed image 101
+    #+NAME:   fig:boxed3
+    [[./boxed/img0100.png]]
+
+    #+CAPTION: Bounding-boxed image 141
+    #+NAME:   fig:boxed4
+    [[./boxed/img0140.png]]
+
+*** Shades
+
+   #+CAPTION: Shaded image 1
+   #+NAME:   fig:shaded1
+   [[./shady/img0000.png]]
+
+   #+CAPTION: Shaded image 51
+   #+NAME:   fig:shaded2
+   [[./shady/img0050.png]]
+
+   #+CAPTION: Shaded image 101
+   #+NAME:   fig:boxed3
+   [[./shady/img0100.png]]
+
+   #+CAPTION: Shaded image 141
+   #+NAME:   fig:shaded4
+   [[./shady/img0140.png]]
+
+** Width and height
+   I used gnuplont and wrote =plotter.gplt= to plot the width and
+   height data so here it goes.
+
+   #+BEGIN_EXAMPLE
+   $ gnuplot plotter.gplt
+   #+END_EXAMPLE
+
+   #+CAPTION: Plot the stride of the figure
+   #+NAME:   fig:stride_plot.png
+   [[./stride_plot.png]]
+
+   #+CAPTION: Plot the height of the figure
+   #+NAME:   fig:height_plot.png
+   [[./height_plot.png]]
+
+   Note that the peak is due to reflection on the drain cover. Fine
+   tuning the threshhold should fix that.
+
+   An estimate of the period is printed by imager but it may be
+   inaccurate.
